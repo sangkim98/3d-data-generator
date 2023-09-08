@@ -103,3 +103,46 @@ scene.add(camera, pose=camera_pose)
 scene.add(light, pose=camera_pose)
 color, depth = r.render(scene)
 cv2.imwrite("c.png", color)
+
+
+
+
+#skeleton xyz only
+#이 예제에는 22개의 bone만이 사용됩니다.
+motion_path = "motion_diffusion_result/"
+motion = np.load(motion_path + "results.npy", allow_pickle=True)[()]['motion']
+
+motion = motion.transpose(3, 0, 1, 2)
+
+print("motion_shape", motion.shape)
+
+center_new = motion[0][0][0]
+render_list = []
+from tqdm import tqdm
+for i in tqdm(range(motion.shape[0])):
+    #for i in range(motion.shape[0]):
+
+    motion_frame = motion[i][0]
+
+    front_camera_pose = np.array([
+    [1.0,  0.0, 0.0, 0 + center_new[0]],
+    [0.0,  1.0, 0.0, 0 + center_new[1]],
+    [0.0,  0.0, 1.0, 2 + center_new[2]],
+    [0.0,  0.0, 0.0, 1.0],
+    ])
+    point_mesh = pyrender.Mesh.from_points(motion_frame)
+    scene.clear()
+    scene.add(point_mesh)
+    scene.add(camera, pose=front_camera_pose)
+    scene.add(light, pose=front_camera_pose)
+    color, depth = r.render(scene)
+    render_list.append(color)
+
+import imageio
+imageio.mimsave("d.gif", render_list, duration=40)
+#from tqdm import tqdm
+#for k in tqdm(range(motion.shape[0])):
+
+#cv2.imwrite("d.png", color)
+#print(points.shape, motion_80_frame.shape)
+
