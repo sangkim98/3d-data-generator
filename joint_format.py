@@ -1,5 +1,4 @@
 REMOVE = 'REMOVE'
-SAME = 'SAME'
 
 MDM_JOINT_MAP = {
     'Hips': 0, 'LeftUpLeg': 1, 'RightUpLeg': 2, 'Spine': 3, 'LeftLeg': 4, 'RightLeg': 5,
@@ -55,10 +54,10 @@ OPENPOSE_JOINT_PAIRS_COLOR = [
 ]
 
 MDM2OPENPOSE_KEYVAL = {
-    'Hips': REMOVE, 'LeftUpLeg': 'LHip', 'RightUpLeg': 'RHip', 'Spine': REMOVE,
+    'Hips': REMOVE, 'LeftUpLeg': REMOVE, 'RightUpLeg': REMOVE, 'Spine': REMOVE,
     'LeftLeg': 'LKnee', 'RightLeg': 'RKnee', 'Spine1': REMOVE, 'LeftFoot': 'LAnkle',
-    'RightFoot': 'RAnkle', 'Spine2': 'Neck', 'LeftToeBase': REMOVE, 'RightToeBase': REMOVE,
-    'Neck': SAME, 'LeftShoulder': REMOVE, 'RightShoulder': REMOVE, 'Head': REMOVE,
+    'RightFoot': 'RAnkle', 'Spine2': REMOVE, 'LeftToeBase': REMOVE, 'RightToeBase': REMOVE,
+    'Neck': REMOVE, 'LeftShoulder': REMOVE, 'RightShoulder': REMOVE, 'Head': 'Nose',
     'LeftArm': 'LShoulder', 'RightArm': 'RShoulder', 'LeftForeArm': 'LElbow', 'RightForeArm': 'RElbow',
     'LeftHand': 'LWrist', 'RightHand': 'RWrist'
 }
