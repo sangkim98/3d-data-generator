@@ -6,7 +6,7 @@ from pathlib import Path
 from sklearn.preprocessing import normalize
 
 
-class mdmCustumVisualize():
+class mdm2openpose():
     def __init__(self, npy_filepath: Path | str) -> None:
         if npy_filepath is not Path:
             npy_filepath = Path(npy_filepath)
@@ -25,16 +25,9 @@ class mdmCustumVisualize():
 
         # Convert Motion Diffusion Model (MDM) 22-keypoints to OpenPose 18-keypoints
         self.openpose_motion = self.convert_mdm2openpose()
-
-    def visualize_all(self, keypoint_type: str):
-        pass
-        if keypoint_type == 'mdm':
-            pass
-        elif keypoint_type == 'coco-18':
-            pass
         
     def convert_mdm2openpose(self):
-        if self.mdm_motion.shape[3] == 22:
+        if self.mdm_motion.shape[1] == 22:
             def create_new_neck():
                 """
                 
@@ -129,10 +122,35 @@ class mdmCustumVisualize():
             (right_eye, left_eye, right_ear, left_ear) = create_eyes_ears()
             (right_hip, left_hip) = create_rlHips()
             
-        elif self.mdm_motion.shape[3] == 18:
+            data_shape = self.mdm_motion.shape
+            
+            openpose_data_shape = (data_shape[0], 18, data_shape[2], data_shape[3])
+            
+            openpose_data_edited = np.empty(openpose_data_shape, dtype=self.mdm_motion.dtype)
+            
+            new_joints = {
+                'Neck': new_neck,
+                'REye': right_eye, 'LEye': left_eye, 'REar': right_ear, 'LEar': left_ear,
+                'RHip': right_hip, 'LHip': left_hip
+            }
+            
+            for mdm_joint, openpose_joint in MDM2OPENPOSE_KEYVAL.items():
+                if openpose_joint != REMOVE:
+                    openpose_data_edited[:,OPENPOSE_JOINT_MAP[openpose_joint],:,:] = self.mdm_motion[:,MDM_JOINT_MAP[mdm_joint],:,:]
+                
+            for new_openpose_joint, data in new_joints.items():
+                openpose_data_edited[:,OPENPOSE_JOINT_MAP[new_openpose_joint],:,:] = data
+                
+                    
+            return openpose_data_edited
+                    
+        elif self.mdm_motion.shape[1] == 18:
             print("Already in OpenPose format")
         else:
             print("Joint format not matching")
             
-    def export_as_npy(self):
-        pass
+    def export_as_npy(self, type: str):
+        if type == 'mdm':
+            pass
+        elif type == 'openpose':
+            pass
