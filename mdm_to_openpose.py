@@ -28,6 +28,28 @@ class mdm2openpose():
         
     def convert_mdm2openpose(self):
         if self.mdm_motion.shape[1] == 22:
+            def norm_of_3D_plane(v1, v2, v3):
+                """_summary_
+
+                Args:
+                    v1 (_type_): _description_
+                    v2 (_type_): _description_
+                    v3 (_type_): _description_
+
+                Returns:
+                    _type_: _description_
+                """
+                
+                a = v1 - v2
+                b = v2 - v3
+                
+                normal_vector = np.cross(a,b,axis=1)
+                
+                for frame in range(normal_vector.shape[-1]):
+                    normalize(normal_vector[:,:,frame], copy=False)
+                    
+                return normal_vector
+            
             def create_new_neck():
                 """
                 
@@ -45,28 +67,6 @@ class mdm2openpose():
                 """
                 
                 """
-                
-                def norm_of_3D_plane(v1, v2, v3):
-                    """_summary_
-
-                    Args:
-                        v1 (_type_): _description_
-                        v2 (_type_): _description_
-                        v3 (_type_): _description_
-
-                    Returns:
-                        _type_: _description_
-                    """
-                    
-                    a = v1 - v2
-                    b = v2 - v3
-                    
-                    normal_vector = np.cross(a,b,axis=1)
-                    
-                    for frame in range(normal_vector.shape[-1]):
-                        normal_vector[:,:,frame] = normalize(normal_vector[:,:,frame])
-                        
-                    return normal_vector
                 
                 head = self.mdm_motion[:,MDM_JOINT_MAP['Head'],:,:]
                 neck = self.mdm_motion[:,MDM_JOINT_MAP['Neck'],:,:]
@@ -94,11 +94,7 @@ class mdm2openpose():
                 right_ear = right_ear - norm_to_mv_ears
                 
                 norm_to_mv_eyes_ears_down = norm_of_3D_plane(head, left_eye, right_eye)
-                # norm_to_mv_eyes_down = np.divide(norm_to_mv_eyes_ears_down, 30)
                 norm_to_mv_ears_down = np.divide(norm_to_mv_eyes_ears_down, 13)
-                
-                # left_eye = left_eye - norm_to_mv_eyes_down
-                # right_eye = right_eye - norm_to_mv_eyes_down
                 
                 left_ear = left_ear - norm_to_mv_ears_down
                 right_ear = right_ear - norm_to_mv_ears_down
@@ -130,7 +126,8 @@ class mdm2openpose():
             
             new_joints = {
                 'Neck': new_neck,
-                'REye': right_eye, 'LEye': left_eye, 'REar': right_ear, 'LEar': left_ear,
+                'REye': right_eye, 'LEye': left_eye,
+                'REar': right_ear, 'LEar': left_ear,
                 'RHip': right_hip, 'LHip': left_hip
             }
             
