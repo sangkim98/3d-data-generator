@@ -7,7 +7,7 @@ from mdm_to_openpose import mdm2openpose
 from joint_format import *
 
 def main():
-    mdm_path = Path("/home/notingcode/Projects/3d/save_result/results_alice_v2.npy")
+    mdm_path = Path("~/Projects/camera_pose/save_result/results_alice_v2.npy")
 
     test = mdm2openpose(mdm_path)
 
@@ -57,12 +57,13 @@ def main():
                 renderer.scene.add_geometry("lineset",lineSet,mat_line)
                 
                 for angle, value in camera_position.items():
-                    renderer.scene.camera.look_at(np.array([center[0],center[1]-0.2,center[2]]),
-                                                np.array([center[0]+value,center[1]+0.1,center[2]+camera_zoom[angle]]),
-                                                np.array([0,1,0])
-                                                )
+                    renderer.setup_camera(70,
+                                          np.array([center[0],center[1]-0.2,center[2]]),
+                                          np.array([center[0]+value,center[1]+0.1,center[2]+camera_zoom[angle]]),
+                                          np.array([0,1,0])
+                                          )
                     img_o3d = renderer.render_to_image()
-                    o3d.io.write_image(os.path.join("/home/notingcode/Projects/3d/openpose_images", f"{action_idx}_{frame_idx}_{angle}.png"), img_o3d)
+                    o3d.io.write_image(os.path.join("/home/notingcode/Projects/camera_pose/openpose_images", f"{action_idx}_{frame_idx}_{angle}.png"), img_o3d)
                 
                 del renderer
     
