@@ -7,14 +7,12 @@ from sklearn.preprocessing import normalize
 
 
 class mdm2openpose():
-    def __init__(self, npy_filepath: Path | str) -> None:
-        if npy_filepath is not Path:
-            npy_filepath = Path(npy_filepath)
+    def __init__(self, filepath: str) -> None:
         
-        if not npy_filepath.exists():
+        if not os.path.exists(filepath):
             raise FileNotFoundError()
 
-        mdm_data = np.load(npy_filepath, allow_pickle=True).item()
+        mdm_data = np.load(filepath, allow_pickle=True).item()
 
         # Initialize Data
         self.mdm_motion = mdm_data['motion']
