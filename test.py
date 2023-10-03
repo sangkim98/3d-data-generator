@@ -32,7 +32,7 @@ def render_mesh(mesh, mesh_center):
             'thefilm': {
                 'type': 'hdrfilm',
                 'width': 1024,
-                'height': 768,
+                'height': 1024,
             },
             'thesampler': {
                 'type': 'multijitter',
