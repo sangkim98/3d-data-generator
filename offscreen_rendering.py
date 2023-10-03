@@ -1,20 +1,38 @@
-import open3d as o3d
-import numpy as np
-import cv2
 import os
-from pathlib import Path
+import argparse
+import numpy as np
+import open3d as o3d
 from mdm_to_openpose import mdm2openpose
 from joint_format import *
 
-def main():
-    mdm_path = Path("~/Projects/camera_pose/save_result/results_alice_v2.npy")
 
-    test = mdm2openpose(mdm_path)
+def main():
+    default_destinationPath = os.path.join(os.path.curdir,'Images','openpose_results')
+    
+    parser = argparse.ArgumentParser(description='Produce multi-angle OpenPose 18-keypoint model images using data produced by Motion Diffusion Model')
+    parser.add_argument('-sp', '--sourcePath',
+                        type=str,
+                        default=os.path.join(os.path.curdir,'results.npy'),
+                        help='Path to *.npy file storing keypoints produced by Motion Diffusion Model'
+                        )
+    parser.add_argument('-dp', '--destinationPath',
+                        type=str,
+                        default=default_destinationPath,
+                        help='Destination directory to save OpenPose images'
+                        )
+    
+    args = parser.parse_args()
+    
+    mdm_npyPath = args.sourcePath
+
+    if not os.path.exists(args.destinationPath):
+        os.makedirs(args.destinationPath)
+
+    test = mdm2openpose(mdm_npyPath)
 
     camera_position = {'left': -0.8,'center': 0,'right': 0.8}
     camera_zoom = {'left': 1.1,'center': 1.3,'right': 1.1}
 
-    #######
     point_colors = []
     joint_pair_idxs = []
     for color_rgb in OPENPOSE_JOINT_COLOR.values():
@@ -27,7 +45,6 @@ def main():
     joint_pair_idxs = np.asarray(joint_pair_idxs)
     joint_pair_colors = np.asarray(OPENPOSE_JOINT_PAIRS_COLOR)
     joint_pair_colors = np.divide(joint_pair_colors,255)
-    ########
     
     pcd = o3d.geometry.PointCloud()
     lineSet = o3d.geometry.LineSet()
@@ -63,7 +80,7 @@ def main():
                                           np.array([0,1,0])
                                           )
                     img_o3d = renderer.render_to_image()
-                    o3d.io.write_image(os.path.join("/home/notingcode/Projects/camera_pose/openpose_images", f"{action_idx}_{frame_idx}_{angle}.png"), img_o3d)
+                    o3d.io.write_image(os.path.join(args.destinationPath, f"{action_idx}_{frame_idx}_{angle}.png"), img_o3d)
                 
                 del renderer
     
