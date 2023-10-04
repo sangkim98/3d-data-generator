@@ -35,15 +35,15 @@ def main():
 
     point_colors = []
     joint_pair_idxs = []
-    for color_rgb in OPENPOSE_JOINT_COLOR.values():
+    for color_rgb in OPENPOSE_18JOINT_COLOR.values():
         point_colors.append(color_rgb)
-    for joint_pair in OPENPOSE_JOINT_PAIRS:
-        joint_pair_idxs.append([OPENPOSE_JOINT_MAP[joint_pair[0]],OPENPOSE_JOINT_MAP[joint_pair[1]]])
+    for joint_pair in OPENPOSE_18JOINT_PAIRS:
+        joint_pair_idxs.append([OPENPOSE_18JOINT_MAP[joint_pair[0]],OPENPOSE_18JOINT_MAP[joint_pair[1]]])
         
     point_colors = np.asarray(point_colors)
     point_colors = np.divide(point_colors,255)
     joint_pair_idxs = np.asarray(joint_pair_idxs)
-    joint_pair_colors = np.asarray(OPENPOSE_JOINT_PAIRS_COLOR)
+    joint_pair_colors = np.asarray(OPENPOSE_18JOINT_PAIRS_COLOR)
     joint_pair_colors = np.divide(joint_pair_colors,255)
     
     pcd = o3d.geometry.PointCloud()
