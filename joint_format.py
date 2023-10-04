@@ -1,13 +1,13 @@
 REMOVE = 'REMOVE'
 
-MDM_JOINT_MAP = {
+MDM_22JOINT_MAP = {
     'Hips': 0, 'LeftUpLeg': 1, 'RightUpLeg': 2, 'Spine': 3, 'LeftLeg': 4, 'RightLeg': 5,
     'Spine1': 6, 'LeftFoot': 7, 'RightFoot': 8, 'Spine2': 9, 'LeftToeBase': 10, 'RightToeBase': 11,
     'Neck': 12, 'LeftShoulder': 13, 'RightShoulder': 14, 'Head': 15, 'LeftArm': 16, 'RightArm': 17,
     'LeftForeArm': 18, 'RightForeArm': 19, 'LeftHand': 20, 'RightHand': 21,
 }
 
-MDM_JOINT_PAIRS = [
+MDM_22JOINT_PAIRS = [
     ['Hips', 'Spine'], ['Spine', 'Spine1'], ['Spine1', 'Spine2'],
     ['Spine2', 'Neck'], ['Neck', 'Head'], ['Spine2', 'RightShoulder'],
     ['RightShoulder', 'RightArm'], ['RightArm','RightForeArm'], ['RightForeArm', 'RightHand'],
@@ -17,7 +17,7 @@ MDM_JOINT_PAIRS = [
     ['LeftUpLeg', 'LeftLeg'], ['LeftLeg', 'LeftFoot'], ['LeftFoot', 'LeftToeBase']
 ]
 
-OPENPOSE_JOINT_MAP = {
+OPENPOSE_18JOINT_MAP = {
     'Nose': 0, 'Neck': 1,
     'RShoulder': 2, 'RElbow': 3, 'RWrist': 4,
     'LShoulder': 5, 'LElbow': 6, 'LWrist': 7,
@@ -26,7 +26,7 @@ OPENPOSE_JOINT_MAP = {
     'REye': 14, 'LEye': 15, 'REar': 16, 'LEar': 17
 }
 
-OPENPOSE_JOINT_COLOR = {
+OPENPOSE_18JOINT_COLOR = {
     'Nose': [255, 0, 0], 'Neck': [255, 85, 0],
     'RShoulder': [255, 170, 0], 'RElbow': [255, 255, 0], 'RWrist': [170, 255, 0],
     'LShoulder': [85, 255, 0], 'LElbow': [0, 255, 0], 'LWrist': [0, 255, 85],
@@ -35,7 +35,7 @@ OPENPOSE_JOINT_COLOR = {
     'REye': [170, 0, 255], 'LEye': [255, 0, 255], 'REar': [255, 0, 170], 'LEar': [255, 0, 85]
 }
 
-OPENPOSE_JOINT_PAIRS = [
+OPENPOSE_18JOINT_PAIRS = [
     ['Neck', 'RShoulder'], ['Neck', 'LShoulder'], ['RShoulder', 'RElbow'],
     ['RElbow', 'RWrist'], ['LShoulder', 'LElbow'], ['LElbow', 'LWrist'],
     ['Neck', 'RHip'], ['RHip', 'RKnee'], ['RKnee', 'RAnkle'],
@@ -44,7 +44,7 @@ OPENPOSE_JOINT_PAIRS = [
     ['Nose', 'LEye'], ['LEye', 'LEar']
 ]
 
-OPENPOSE_JOINT_PAIRS_COLOR = [
+OPENPOSE_18JOINT_PAIRS_COLOR = [
     [153, 0, 0], [153, 51, 0], [153, 102, 0],
     [153, 153, 0], [102, 153, 0], [51, 153, 0],
     [0, 153, 0], [0, 153, 51], [0, 153, 102],

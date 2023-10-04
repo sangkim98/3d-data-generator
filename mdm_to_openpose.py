@@ -1,8 +1,6 @@
 import os
 import numpy as np
-import open3d as o3d
 from joint_format import *
-from pathlib import Path
 from sklearn.preprocessing import normalize
 
 
@@ -21,7 +19,7 @@ class mdm2openpose():
         self.num_samples = mdm_data['num_repetitions']
         self.num_repetitions = mdm_data['num_repetitions']
 
-        # Convert Motion Diffusion Model (MDM) 22-keypoints to OpenPose 18-keypoints
+        # Convert Motion Diffusion Model keypoints to OpenPose 18-keypoints
         self.openpose_motion = self.convert_mdm2openpose()
         
     def convert_mdm2openpose(self):
@@ -53,9 +51,9 @@ class mdm2openpose():
                 
                 """
             
-                left_shoulder = self.mdm_motion[:,MDM_JOINT_MAP['LeftShoulder'],:,:]
-                right_shoulder = self.mdm_motion[:,MDM_JOINT_MAP['RightShoulder'],:,:]
-                spine2 = self.mdm_motion[:,MDM_JOINT_MAP['Spine2'],:,:]
+                left_shoulder = self.mdm_motion[:,MDM_22JOINT_MAP['LeftShoulder'],:,:]
+                right_shoulder = self.mdm_motion[:,MDM_22JOINT_MAP['RightShoulder'],:,:]
+                spine2 = self.mdm_motion[:,MDM_22JOINT_MAP['Spine2'],:,:]
                 
                 new_neck = (left_shoulder+right_shoulder)*0.45 + spine2*0.1
                 
@@ -66,9 +64,9 @@ class mdm2openpose():
                 
                 """
                 
-                head = self.mdm_motion[:,MDM_JOINT_MAP['Head'],:,:]
-                neck = self.mdm_motion[:,MDM_JOINT_MAP['Neck'],:,:]
-                spine2 = self.mdm_motion[:,MDM_JOINT_MAP['Spine2'],:,:]
+                head = self.mdm_motion[:,MDM_22JOINT_MAP['Head'],:,:]
+                neck = self.mdm_motion[:,MDM_22JOINT_MAP['Neck'],:,:]
+                spine2 = self.mdm_motion[:,MDM_22JOINT_MAP['Spine2'],:,:]
 
                 normal_vector = norm_of_3D_plane(head, neck, spine2)
 
@@ -104,8 +102,8 @@ class mdm2openpose():
                 
                 """
                 
-                left_upleg = self.mdm_motion[:,MDM_JOINT_MAP['LeftUpLeg'],:,:]
-                right_upleg = self.mdm_motion[:,MDM_JOINT_MAP['RightUpLeg'],:,:]
+                left_upleg = self.mdm_motion[:,MDM_22JOINT_MAP['LeftUpLeg'],:,:]
+                right_upleg = self.mdm_motion[:,MDM_22JOINT_MAP['RightUpLeg'],:,:]
 
                 left_hip = (left_upleg*1.1+right_upleg*-0.1)                
                 right_hip = (left_upleg*-0.1+right_upleg*1.1)
@@ -131,10 +129,10 @@ class mdm2openpose():
             
             for mdm_joint, openpose_joint in MDM2OPENPOSE_KEYVAL.items():
                 if openpose_joint != REMOVE:
-                    openpose_data_edited[:,OPENPOSE_JOINT_MAP[openpose_joint],:,:] = self.mdm_motion[:,MDM_JOINT_MAP[mdm_joint],:,:]
+                    openpose_data_edited[:,OPENPOSE_18JOINT_MAP[openpose_joint],:,:] = self.mdm_motion[:,MDM_22JOINT_MAP[mdm_joint],:,:]
                 
             for new_openpose_joint, data in new_joints.items():
-                openpose_data_edited[:,OPENPOSE_JOINT_MAP[new_openpose_joint],:,:] = data
+                openpose_data_edited[:,OPENPOSE_18JOINT_MAP[new_openpose_joint],:,:] = data
                 
                     
             return openpose_data_edited
