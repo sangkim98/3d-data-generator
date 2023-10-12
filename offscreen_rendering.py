@@ -2,7 +2,7 @@ import os
 import argparse
 import numpy as np
 import open3d as o3d
-from mdm_to_openpose import mdm2openpose
+from mdm2openpose import mdm2openpose
 from joint_format import *
 
 
