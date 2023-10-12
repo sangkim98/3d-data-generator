@@ -1,0 +1,25 @@
+{
+    "type": "batch",
+    "sensors": {
+        "sensor1": {
+            "type": "perspective",
+            "fov": 60,
+            "to_world": {"up" : [0,1,0], "x_offset": 0, "y_offset": 0.6, "z_offset": 1.5}
+        },
+        "sensor2": {
+            "type": "perspective",
+            "fov": 60,
+            "to_world": {"up" : [0,1,0], "x_offset": 0, "y_offset": 0.6, "z_offset": -1.5}
+        },
+        "sensor3": {
+            "type": "perspective",
+            "fov": 60,
+            "to_world": {"up" : [0,1,0], "x_offset": 1.5, "y_offset": 0.6, "z_offset": 0}
+        },
+        "sensor4": {
+            "type": "perspective",
+            "fov": 60,
+            "to_world": {"up" : [0,1,0], "x_offset": -1.5, "y_offset": 0.6, "z_offset": 0}
+        }
+    }
+}
