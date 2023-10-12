@@ -8,28 +8,6 @@ import mitsuba as mi
 from mdm2openpose import mdm2openpose
 from joint_format import *
 
-# def read_camera_params(filepath: str):
-#     if os.path.exists(filepath):
-#         camera_params = json.load(open(filepath))
-#     else:
-#         return None
-    
-#     mi_camera_params = dict()
-    
-#     camera_type = camera_params['type']
-    
-#     if camera_type == 'batch':
-#         cameras_params = camera_params['cameras']
-        
-#         mi_camera_params['type'] = camera_type
-        
-#         for camera_name, paramters in camera_params.items():
-#             mi_camera_params[camera_name] = {'type' : paramters['type'],
-#                                              'fov' : paramters['fov'],
-#                                              'to_world' : mi.ScalarTransform4f.look_at(origin = )}
-#     elif:
-#         pass
-
 def render_mesh(mesh, mesh_center, exr_path: str):
     scene = mi.load_dict({
         'type': 'scene',
@@ -37,9 +15,6 @@ def render_mesh(mesh, mesh_center, exr_path: str):
             'type': 'path'
         },
         'light': {
-            # NOTE: For better results comment out the constant emitter above
-            # and uncomment out the lines below changing the filename to an HDRI
-            # envmap you have.
             'type': 'envmap',
             'filename': exr_path,
             'scale': 1.0,
