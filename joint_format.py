@@ -62,6 +62,10 @@ MDM2OPENPOSE_KEYVAL = {
     'LeftHand': 'LWrist', 'RightHand': 'RWrist'
 }
 
+SMPLX2OPENPOSE_IDX = [
+    13,6,8,10,12,7,9,11,1,3,5,0,2,4,14,15,16,17
+]
+
 SMPLX_JOINT_NAMES = [
     "pelvis",
     "left_hip",
