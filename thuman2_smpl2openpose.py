@@ -8,28 +8,19 @@ import mitsuba as mi
 from joint_format import *
 import multiview_rendering
 from smplx2openpose import smplx2openpose
+import time
 
 TEST_NAME = 'test4'
 
-def remove_wrists_from_smpl(path):
-    smpl_path = Path(path).glob('*.ply')
-    
-    for path in smpl_path:
-        smpl_path = path
-    
-    pcd = o3d.io.read_point_cloud(smpl_path.as_posix())
-    pcd_np = np.asarray(pcd.points)
-    pcd_removed = np.delete(pcd_np,[20,21],axis=0)
-    
-    return pcd_removed
-
 def main():
+    start = time.time()
+    
     default_destinationPath = os.path.join(os.path.curdir,'Images','openpose_results')
     
     parser = argparse.ArgumentParser(description='')
     parser.add_argument('-sp', '--smplPath',
                         type=str,
-                        help='Path to *.ply dataset'
+                        help='Path to *.obj'
                         )
     parser.add_argument('-exrp','--exrPath',
                         type=str,
@@ -50,17 +41,17 @@ def main():
     if not os.path.exists(args.destinationPath):
         os.makedirs(args.destinationPath)
 
-    openpose_params = smplx2openpose('/home/notingcode/Projects/3d_visualize/models/smplx',
-                                     '/home/notingcode/Projects/3d_visualize/Thuman2_data/Thuman2_SMPLX/0026/smplx_param.pkl'
+    openpose_params = smplx2openpose('/media/notingcode/Data/Projects/3d_visualize/models/smplx',
+                                     '/media/notingcode/Data/Projects/3d_visualize/Thuman2_data/Thuman2_SMPLX/0000/smplx_param.pkl'
                                      )
     
     openpose_joints = openpose_params.joints
     scale = openpose_params.scale
 
-    png_out_model, png_out_exr, mesh_center, scale_center = multiview_rendering.create_hdri(smpl_path, exr_path)
+    png_out_model, mesh_center, scale_center = multiview_rendering.create_hdri(smpl_path, exr_path)
 
     png_out_model.write(os.path.join(dest_path, f"{TEST_NAME}.png"))
-    png_out_exr.write(os.path.join(dest_path, f"{TEST_NAME}_hdri.png"))
+    # png_out_exr.write(os.path.join(dest_path, f"{TEST_NAME}_hdri.png"))
     
     point_colors = []
     joint_pair_idxs = []
@@ -90,7 +81,7 @@ def main():
     pcd.points = o3d.utility.Vector3dVector(openpose_joints)
     pcd.colors = o3d.utility.Vector3dVector(point_colors)
     pcd.scale(scale, center=scale_center)
-    pcd.scale(1.3, center=scale_center)
+    # pcd.scale(1.3, center=scale_center)
     lineSet.points = pcd.points
     lineSet.lines = o3d.utility.Vector2iVector(joint_pair_idxs)
     lineSet.colors = o3d.utility.Vector3dVector(joint_pair_colors)
@@ -107,5 +98,9 @@ def main():
                               )
         img_o3d = renderer.render_to_image()
         o3d.io.write_image(os.path.join(args.destinationPath, f"{TEST_NAME}_{angle}.png"), img_o3d)
+    
+    end = time.time()
+    
+    print(f"duration: {end-start}")
     
 main()
