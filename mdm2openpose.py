@@ -1,11 +1,11 @@
 import os
 import numpy as np
+from convert2openpose import convert2openpose
 from joint_format import *
-from sklearn.preprocessing import normalize
 
-
-class mdm2openpose():
+class mdm2openpose(convert2openpose):
     def __init__(self, filepath: str) -> None:
+        super().__init__()
         
         if not os.path.exists(filepath):
             raise FileNotFoundError()
@@ -15,42 +15,31 @@ class mdm2openpose():
         # Initialize Data
         self.mdm_motion = mdm_data['motion']
         self.text = mdm_data['text']
-        self.lengths = mdm_data['num_samples']
+        self.lengths = mdm_data['lengths']
         self.num_samples = mdm_data['num_repetitions']
         self.num_repetitions = mdm_data['num_repetitions']
 
         # Convert Motion Diffusion Model keypoints to OpenPose 18-keypoints
-        self.openpose_motion = self.convert_mdm2openpose()
+        self.openpose_motion = self.convert()
         
-    def convert_mdm2openpose(self):
+    def convert(self):
         if self.mdm_motion.shape[1] == 22:
-            def norm_of_3D_plane(v1, v2, v3):
-                """_summary_
-
-                Args:
-                    v1 (_type_): _description_
-                    v2 (_type_): _description_
-                    v3 (_type_): _description_
-
-                Returns:
-                    _type_: _description_
-                """
+            def norm_of_3D_plane(v1, v2, v3, num_frames: int):
                 
-                a = v1 - v2
-                b = v2 - v3
+                arrays_2d = []
                 
-                normal_vector = np.cross(a,b,axis=1)
+                for frame in range(num_frames):
+                    arrays_2d.append(self.norm_of_plane(v1[..., frame],
+                                                        v2[..., frame],
+                                                        v3[..., frame]
+                                                        )
+                                     )
                 
-                for frame in range(normal_vector.shape[-1]):
-                    normalize(normal_vector[:,:,frame], copy=False)
+                normal_vector = np.dstack(arrays_2d)
                     
                 return normal_vector
             
             def create_new_neck():
-                """
-                
-                """
-            
                 left_shoulder = self.mdm_motion[:,MDM_22JOINT_MAP['LeftShoulder'],:,:]
                 right_shoulder = self.mdm_motion[:,MDM_22JOINT_MAP['RightShoulder'],:,:]
                 spine2 = self.mdm_motion[:,MDM_22JOINT_MAP['Spine2'],:,:]
@@ -59,16 +48,12 @@ class mdm2openpose():
                 
                 return new_neck
                 
-            def create_eyes_ears():
-                """
-                
-                """
-                
+            def create_eyes_ears():   
                 head = self.mdm_motion[:,MDM_22JOINT_MAP['Head'],:,:]
                 neck = self.mdm_motion[:,MDM_22JOINT_MAP['Neck'],:,:]
                 spine2 = self.mdm_motion[:,MDM_22JOINT_MAP['Spine2'],:,:]
 
-                normal_vector = norm_of_3D_plane(head, neck, spine2)
+                normal_vector = norm_of_3D_plane(head, neck, spine2, head.shape[-1])
 
                 normal_vector_eyes = np.divide(normal_vector,20)
                 normal_vector_ears = np.divide(normal_vector,13)
@@ -79,7 +64,7 @@ class mdm2openpose():
                 left_ear = head - normal_vector_ears
                 right_ear = head + normal_vector_ears
                 
-                norm_to_mv_eyes_ears = norm_of_3D_plane(neck, left_eye, right_eye)
+                norm_to_mv_eyes_ears = norm_of_3D_plane(neck, left_eye, right_eye, neck.shape[-1])
                 norm_to_mv_eyes = np.divide(norm_to_mv_eyes_ears, 22)
                 norm_to_mv_ears = np.divide(norm_to_mv_eyes_ears, 20)
                 
@@ -89,7 +74,7 @@ class mdm2openpose():
                 left_ear = left_ear - norm_to_mv_ears
                 right_ear = right_ear - norm_to_mv_ears
                 
-                norm_to_mv_eyes_ears_down = norm_of_3D_plane(head, left_eye, right_eye)
+                norm_to_mv_eyes_ears_down = norm_of_3D_plane(head, left_eye, right_eye, head.shape[-1])
                 norm_to_mv_ears_down = np.divide(norm_to_mv_eyes_ears_down, 13)
                 
                 left_ear = left_ear - norm_to_mv_ears_down
@@ -97,11 +82,7 @@ class mdm2openpose():
                 
                 return (right_eye, left_eye, right_ear, left_ear)            
                 
-            def create_rlHips():                
-                """
-                
-                """
-                
+            def create_rlHips():
                 left_upleg = self.mdm_motion[:,MDM_22JOINT_MAP['LeftUpLeg'],:,:]
                 right_upleg = self.mdm_motion[:,MDM_22JOINT_MAP['RightUpLeg'],:,:]
 
