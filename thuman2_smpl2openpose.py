@@ -1,103 +1,83 @@
 import os
 import argparse
+import random
 import json
-from pathlib import Path
-import numpy as np
-import open3d as o3d
-import mitsuba as mi
-from joint_format import *
-import multiview_rendering
-from smplx2openpose import smplx2openpose
 import time
-
-TEST_NAME = 'test4'
+from pathlib import Path
+from joint_format import *
+from smplx2openpose import smplx2openpose
 
 def main():
     start = time.time()
     
-    default_destinationPath = os.path.join(os.path.curdir,'Images','openpose_results')
+    default_destinationPath = os.path.join(os.path.curdir,'Images','thuman_multiview_renders')
     
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('-sp', '--smplPath',
+    parser.add_argument('-objp', '--obj-models-path',
                         type=str,
-                        help='Path to *.obj'
+                        help='Path containing Thuman2.0 *.objs'
                         )
-    parser.add_argument('-exrp','--exrPath',
+    parser.add_argument('-exrp','--exr-images-path',
                         type=str,
-                        help='Path to *.exr image'
+                        help='Path to *.exr images'
                         )
-    parser.add_argument('-dp', '--destinationPath',
+    parser.add_argument('smplx', '--smplx-model-path',
+                        type=str,
+                        help='Path to SMPL-X Model *.pkl'
+                        )
+    parser.add_argument('-fpp', '--smplx-fitting-params-path',
+                        type=str,
+                        help='Path to SMPL-X fitting parameters corresponding to the *.obj models'
+                        )
+    parser.add_argument('-dp', '--destination-path',
                         type=str,
                         default=default_destinationPath,
-                        help='Destination directory to save OpenPose images'
+                        help='Destination directory to save rendered images'
                         )
     
     args = parser.parse_args()
     
-    smpl_path = args.smplPath
-    exr_path = args.exrPath
-    dest_path = args.destinationPath
+    objs_dir = Path(args.obj_models_path)
+    exrs_dir = Path(args.exr_images_path)
+    smplx_model_dir = args.smplx_model_path
+    fitting_params_dir = args.smplx_fitting_params_path
+    dest_path = args.destination_path
 
-    if not os.path.exists(args.destinationPath):
-        os.makedirs(args.destinationPath)
+    if not os.path.exists(dest_path):
+        os.makedirs(dest_path)
 
-    openpose_params = smplx2openpose('/media/notingcode/Data/Projects/3d_visualize/models/smplx',
-                                     '/media/notingcode/Data/Projects/3d_visualize/Thuman2_data/Thuman2_SMPLX/0000/smplx_param.pkl'
-                                     )
-    
-    openpose_joints = openpose_params.joints
-    scale = openpose_params.scale
+    glob_objs = objs_dir.rglob("*.obj")
+    glob_exrs = exrs_dir.rglob("*.exr")
 
-    png_out_model, mesh_center, scale_center = multiview_rendering.create_hdri(smpl_path, exr_path)
+    objs_relative_paths = []
+    exrs_relative_paths = []
 
-    png_out_model.write(os.path.join(dest_path, f"{TEST_NAME}.png"))
-    # png_out_exr.write(os.path.join(dest_path, f"{TEST_NAME}_hdri.png"))
-    
-    point_colors = []
-    joint_pair_idxs = []
-    for color_rgb in OPENPOSE_18JOINT_COLOR.values():
-        point_colors.append(color_rgb)
-    for joint_pair in OPENPOSE_18JOINT_PAIRS:
-        joint_pair_idxs.append([OPENPOSE_18JOINT_MAP[joint_pair[0]],OPENPOSE_18JOINT_MAP[joint_pair[1]]])
-        
-    point_colors = np.asarray(point_colors)
-    point_colors = np.divide(point_colors,255)
-    joint_pair_idxs = np.asarray(joint_pair_idxs)
-    joint_pair_colors = np.asarray(OPENPOSE_18JOINT_PAIRS_COLOR)
-    joint_pair_colors = np.divide(joint_pair_colors,255)
-    
-    pcd = o3d.geometry.PointCloud()
-    lineSet = o3d.geometry.LineSet()
-    
-    mat_line = o3d.visualization.rendering.MaterialRecord()
-    mat_point = o3d.visualization.rendering.MaterialRecord()
+    for obj_path in glob_objs:
+        objs_relative_paths.append(obj_path.relative_to(objs_dir).as_posix())
+    for exr_path in glob_exrs:
+        exrs_relative_paths.append(exr_path.relative_to(exrs_dir).as_posix())
 
-    mat_line.shader = "unlitLine"
-    mat_line.line_width = 15
-    mat_point.point_size = 15
+    random.shuffle(exrs_relative_paths)
     
-    renderer = o3d.visualization.rendering.OffscreenRenderer(1024,1024)
-    renderer.scene.set_background(np.array([0,0,0,0]))
-    pcd.points = o3d.utility.Vector3dVector(openpose_joints)
-    pcd.colors = o3d.utility.Vector3dVector(point_colors)
-    pcd.scale(scale, center=scale_center)
-    # pcd.scale(1.3, center=scale_center)
-    lineSet.points = pcd.points
-    lineSet.lines = o3d.utility.Vector2iVector(joint_pair_idxs)
-    lineSet.colors = o3d.utility.Vector3dVector(joint_pair_colors)
-    renderer.scene.add_geometry("pcd", pcd, mat_point)
-    renderer.scene.add_geometry("lineset", lineSet, mat_line)
-    
-    camera_position = {'front': [0,0.6+mesh_center[1],1.5], 'back': [0,0.6+mesh_center[1],-1.5], 'left': [1.5,0.6+mesh_center[1],0], 'right': [-1.5,0.6+mesh_center[1],0]}
-    
-    for angle, value in camera_position.items():
-        renderer.setup_camera(60,
-                              mesh_center,
-                              np.array(value),
-                              np.array([0,1,0])
-                              )
-        img_o3d = renderer.render_to_image()
-        o3d.io.write_image(os.path.join(args.destinationPath, f"{TEST_NAME}_{angle}.png"), img_o3d)
+    smplx_param_name = 'smplx_param.pkl'
+    obj_exr_pathPair = dict(zip(objs_relative_paths, exrs_relative_paths))
+
+    for obj_relative_path, exr_relative_path in obj_exr_pathPair.items():
+        obj_path = os.path.join(objs_dir, obj_relative_path)
+        exr_path = os.path.join(exrs_dir, exr_relative_path)
+        fitting_param_path_name = os.path.join(fitting_params_dir, os.path.split(obj_relative_path)[0], smplx_param_name)
+
+        # add openpose rendering component here
+        converted_pose_model = smplx2openpose(smplx_model_dir, fitting_param_path_name)
+        converted_pose_model.openpose_renderer(destination_path='')
+
+        # add mesh+texture+background rendering component here
+        converted_pose_model.mesh_renderer()
+
+        # png_out_model, mesh_center, scale_center = multiview_rendering.create(smpl_path, exr_path)
+
+        png_out_model.write(os.path.join(dest_path, f"{TEST_NAME}.png"))
+        # png_out_exr.write(os.path.join(dest_path, f"{TEST_NAME}_hdri.png"))
     
     end = time.time()
     
