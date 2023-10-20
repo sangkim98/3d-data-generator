@@ -21,7 +21,7 @@ def main():
                         type=str,
                         help='Path to *.exr images'
                         )
-    parser.add_argument('smplx', '--smplx-model-path',
+    parser.add_argument('-smplx', '--smplx-model-path',
                         type=str,
                         help='Path to SMPL-X Model *.pkl'
                         )
@@ -67,17 +67,11 @@ def main():
         exr_path = os.path.join(exrs_dir, exr_relative_path)
         fitting_param_path_name = os.path.join(fitting_params_dir, os.path.split(obj_relative_path)[0], smplx_param_name)
 
-        # add openpose rendering component here
-        converted_pose_model = smplx2openpose(smplx_model_dir, fitting_param_path_name)
-        converted_pose_model.openpose_renderer(destination_path='')
-
-        # add mesh+texture+background rendering component here
-        converted_pose_model.mesh_renderer()
-
-        # png_out_model, mesh_center, scale_center = multiview_rendering.create(smpl_path, exr_path)
-
-        png_out_model.write(os.path.join(dest_path, f"{TEST_NAME}.png"))
-        # png_out_exr.write(os.path.join(dest_path, f"{TEST_NAME}_hdri.png"))
+        fileName = os.path.basename(obj_path).split('.')[0]
+        converted_pose_model = smplx2openpose(smplx_model_dir, fitting_param_path_name, id=fileName)
+        
+        converted_pose_model.mesh_renderer(obj_path, exr_path, destination_path=dest_path)
+        converted_pose_model.openpose_renderer(15, 15, destination_path=dest_path)
     
     end = time.time()
     
