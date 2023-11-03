@@ -55,10 +55,10 @@ class convert2openpose():
         mat_line.line_width = line_width
         mat_point.point_size = point_size
 
-        # if self.mesh is None:
-        #     self.center = pcd.get_center()
-        # else:
-        #     self.center = self.mesh.get_center()    
+        if self.mesh is None:
+            self.center = pcd.get_center()
+        else:
+            self.center = self.mesh.get_center()    
         
         renderer = o3d.visualization.rendering.OffscreenRenderer(1024,1024)
         renderer.scene.set_background(np.array([0,0,0,0]))
