@@ -46,7 +46,7 @@
 <!-- Shapes -->
 
 	<shape type="obj">
-		<string name="filename" value="meshes/test3.obj"/>
+		<string name="filename" value="meshes/untitled.obj"/>
 		<ref id="mat-Sphere" name="bsdf"/>
 		<emitter type="area">
 			<texture type="bitmap" name="radiance">
