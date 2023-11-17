@@ -5,18 +5,14 @@
 	<integrator type="path">
 	</integrator>
 
-	<emitter type="envmap">
-		<string name="filename" value="textures/machine_shop_02_8k.exr"/>
-	</emitter>
-
 <!-- Camera and Rendering Parameters -->
 
 	<sensor type="perspective">
-	    <float name="fov" value="90"/>
+	    <float name="fov" value="70"/>
 	    <transform name="to_world">
 		<!-- Move and rotate the camera so that looks from (1, 1, 1) to (1, 2, 1)
 		    and the direction (0, 0, 1) points "up" in the output image -->
-			<lookat origin="3, 40, 40" target="0, 10, 0" up="0, 1, 0"/>
+			<lookat origin="3, 40, 40" target="0, 20, 0" up="0, 1, 0"/>
 	    </transform>
 	    <!-- film -->
 	    <film type="hdrfilm">
@@ -30,32 +26,35 @@
 
 <!-- Materials -->
 
-	<bsdf type="twosided" id="mat-Sphere">
-		<bsdf type="principled">
-			<texture type="bitmap" name="base_color">
-				<string name="filename" value="textures/machine_shop_02_16k.hdr"/>
-				<boolean name="raw" value="true"/>
-			</texture>
-			<float name="spec_tint" value="0.000000"/>
-			<float name="spec_trans" value="0.000000"/>
-			<float name="metallic" value="0.000000"/>
-			<float name="anisotropic" value="0.000000"/>
-			<float name="roughness" value="0.000000"/>
-			<float name="sheen" value="0.000000"/>
-			<float name="sheen_tint" value="0.0"/>
-			<float name="clearcoat" value="0.000000"/>
-			<float name="clearcoat_gloss" value="0.0"/>
-			<float name="specular" value="0.0"/>
-		</bsdf>
+	<bsdf type="principled" id="mat-Sphere">
+		<float name="metallic" value="0.0" />
+		<float name="specular" value="0.0" />
+		<float name="roughness" value="0.0" />
+		<float name="spec_tint" value="0.0" />
+		<float name="anisotropic" value="0.0" />
+		<float name="sheen" value="0.0" />
+		<float name="sheen_tint" value="0.0" />
+		<float name="clearcoat" value="0.0" />
+		<float name="clearcoat_gloss" value="0.0" />
+		<float name="spec_trans" value="1.0" />
 	</bsdf>
 
 <!-- Emitters -->
 
 
+
 <!-- Shapes -->
 
 	<shape type="obj">
-		<string name="filename" value="meshes/untitled.obj"/>
+		<string name="filename" value="meshes/test3.obj"/>
 		<ref id="mat-Sphere" name="bsdf"/>
+		<emitter type="area">
+			<texture type="bitmap" name="radiance">
+				<string name="filename" value="textures/rosendal_park_sunset_8k.hdr"/>
+				<boolean name="raw" value="true"/>
+			</texture>
+		</emitter>
+		<boolean name="flip_normals" value="true"/>
 	</shape>
+
 </scene>
