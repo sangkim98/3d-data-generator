@@ -1,0 +1,74 @@
+<scene version="3.4.0">
+
+<!-- Defaults, these can be set via the command line: -Darg=value -->
+
+	<integrator type="path">
+	</integrator>
+
+<!-- Camera and Rendering Parameters -->
+
+	<sensor type="perspective">
+	    <float name="fov" value="70"/>
+	    <transform name="to_world">
+			<lookat origin="3, 40, 40" target="0, 20, 0" up="0, 1, 0"/>
+	    </transform>
+	    <!-- film -->
+	    <film type="hdrfilm">
+			<integer name="width" value="1024"/>
+			<integer name="height" value="1024"/>
+	    </film>
+	    <sampler type="multijitter">
+		    <integer name="sample_count" value="256"/>
+		</sampler>
+	</sensor>
+
+<!-- Materials -->
+
+	<bsdf type="diffuse" id="mat-me">
+		<texture type="bitmap" name="reflectance">
+			<string name="filename" value="/media/notingcode/Data/Projects/3d_visualize/mitsuba/textures/me2.jpg"/>
+		</texture>
+	</bsdf>
+
+	<bsdf type="principled" id="mat-background">
+		<texture type="bitmap" name="base_color">
+			<string name="filename" value="/media/notingcode/Data/BlenderAssets/polyhaven_hdris/abandoned_tank_farm_01_8k.exr"/>
+			<boolean name="raw" value="true"/>
+		</texture>
+		<float name="metallic" value="0.0" />
+		<float name="specular" value="0.0" />
+		<float name="roughness" value="1.0" />
+		<float name="spec_tint" value="0.0" />
+		<float name="anisotropic" value="0.0" />
+		<float name="sheen" value="0.0" />
+		<float name="sheen_tint" value="0.0" />
+		<float name="clearcoat" value="0.0" />
+		<float name="clearcoat_gloss" value="0.0" />
+		<float name="spec_trans" value="0.0" />
+	</bsdf>
+
+<!-- Shapes -->
+
+	<shape type="obj">
+		<string name="filename" value="meshes/lighting.obj"/>
+		<emitter type="area">
+			<texture type="bitmap" name="radiance">
+				<string name="filename" value="/media/notingcode/Data/BlenderAssets/polyhaven_hdris/abandoned_tank_farm_01_8k.exr"/>
+				<boolean name="raw" value="true"/>
+			</texture>
+		</emitter>
+		<boolean name="flip_normals" value="true"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="/home/notingcode/Desktop/me/me2.obj"/>
+		<ref id="mat-me" name="bsdf"/>
+	</shape>
+
+	<shape type="obj">
+		<string name="filename" value="meshes/background.obj"/>
+		<ref id="mat-background" name="bsdf"/>
+		<boolean name="flip_normals" value="true"/>
+	</shape>
+
+</scene>
